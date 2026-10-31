@@ -58,8 +58,10 @@ def main():
         if p.suffix=='.npz':assert p.parts[:2]==('inference','checkpoint')
     print(json.dumps({'materials_ready':True,'official_test_accuracy':score['accuracy'],'asset_files':len(actual),
         'asset_bytes':assets,'report_pages':report['pages'],'frozen_source_hashes':'passed','release_hashes':'passed',
-        'single_GPU_training_replay':reproduction['state'],'published_or_submitted':False,
-        'user_actions_remaining':['publish public code/checkpoint links','fill student ID','create official GitHub submission issue']},indent=2))
+        'single_GPU_training_replay':reproduction['state'],
+        'scope':'package integrity and recorded measurements; not instructor eligibility approval',
+        'eligibility_review_remaining':['reference CPU timing','original concurrent development GPU schedule'],
+        'score_submission':'student action; this checker does not create submission issues'},indent=2))
 
 
 if __name__=='__main__':main()

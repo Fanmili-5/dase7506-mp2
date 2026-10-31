@@ -6,6 +6,9 @@
   "official_commit": "bb801f4f2e7629d270df765ab12c333b2dc616bb",
   "entrypoint": "inference/methods/improvement_selected_verifier.py:predict(bank, arrays, checkpoint)",
   "checkpoint_path": "inference/checkpoint",
-  "published_git_commit": null,
-  "published_or_submitted": false
+  "published_or_submitted": true,
+  "documentation_revision": "readability-v2",
+  "repository": "https://github.com/Fanmili-5/dase7506-mp2",
+  "model_source_base_commit": "ad0982a3aff4696b4c1788122fe94070db0aef96",
+  "score_submitted_by_assistant": false
 }

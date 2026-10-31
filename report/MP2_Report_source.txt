@@ -1,207 +1,171 @@
-Selecting Reliable<br/>LLM Reasoning
+# Choosing among four mathematical solutions
 
-DASE7506 Mini-Project 2 | Relative and joint verifiers | 31 October 2026
+DASE7506 Mini-Project 2 | 31 October 2026
 
-1. Task, question, and submitted result
+## 1. Task and approach
 
-The task is to choose one of four supplied solutions to a mathematics question, using the question, candidate texts, and their fixed 1,024-dimensional representations. Supervision is the final numeric answer, parsed by the unchanged course evaluator. A correct answer need not have a completely correct explanation. Training uses only the supplied training split; validation supports development and selection. [1]
+The submitted program chooses a correct final answer on **399 of 467 test questions (85.44%)**. It combines a linear verifier with two small neural verifiers. Complete test prediction and scoring took 3.14 seconds on the local CPU, using 11.26 MiB of inference assets.
 
-<b>Question.</b> Can a small jointly trained verifier complement a standalone relative verifier enough to justify its cost under the CPU and asset limits? We expected candidate interaction and different outcome objectives to provide complementary rankings. The submitted method combines a relative logistic verifier with two compact neural verifiers. It uses no pretrained weights, external data, generated labels, or online inference.
+For each question, the course supplies four solutions and a 1,024-dimensional representation of each solution. A verifier assigns scores to these candidates and returns one index. The evaluator checks the final numeric answer, including equivalent fractions and decimals. It does not check every reasoning step. [1]
 
-Recorded metric | Result / scope
+The main question was whether learned interactions among the four candidates could improve on a simple linear verifier. The linear model already uses relative features, but has no learned attention between candidates. I expected the attention layer and different training objectives to produce useful differences in their rankings.
 
-Official complete test | 399/467 = 85.438972%
+The starting model uses the supplied representations and 32 arithmetic and number-source features. The neural models read the same information, with an attention layer that compares candidates. One objective rewards assigning probability to any correct candidate; the other ranks correct candidates above incorrect ones. Their scores are combined after normalization within each question.
 
-Official complete validation | 751/798 = 94.1103% (frozen CPU implementation)
+### Data and evaluation
 
-Validation disagreement subset | 308/355 = 86.7606% (frozen CPU implementation)
+| Split | Questions | Use |
+| --- | --- | --- |
+| Training | 4,755; 2,114 disagreement questions | Fit parameters and preprocessing |
+| Validation | 798; 355 disagreement questions | Early stopping and model selection |
+| Test | 467; all disagreement questions | Official score |
 
-Full CPU prediction + separate scoring | 3.136154 seconds, Xeon 8368Q
+A disagreement question has at least two distinct valid parsed answers among its candidates. It is the useful development subset because unanimous answers make selection much easier. The final CPU implementation scores 308/355 (86.76%) on this subset and 751/798 (94.11%) on full validation. The latter includes 443 unanimous groups, so its percentage is not directly comparable with the test result.
 
-Additional inference assets | 11,808,974 bytes = 11.261915 MiB
+Only the supplied training split is used for fitting. All preprocessing statistics come from training disagreement questions. Validation was reused for several comparisons; its best scores should therefore be read as development results.
 
-Submission identity | Freeze 4ab3279f6f968f80; full SHA in manifests
+<!-- pagebreak -->
 
-Data and the scoring unit
+## 2. Models
 
-The official splits contain 4,755 training, 798 validation, and 467 test questions. There are 2,114 training and 355 validation questions with multiple distinct valid parsed answers. Every test question is a disagreement question. The other 443 validation questions are easier unanimous-answer groups; therefore the 94.11% full-validation result must not be compared directly with the 85.44% test result. [1]
+### Relative linear verifier
 
-The reported submission value is the official scorer's <b>accuracy</b> field, <b>85.4389721627409</b>, on all 467 test questions. The independent evaluator reads references only after prediction. Checkpoint reproduction on the reference machine determines final eligibility; these measurements do not establish a leaderboard rank.
+The baseline independently implements the relative-verifier design in [2]. For each question, it subtracts the mean candidate representation and divides by the average centered vector norm. The 32 scalar features are also centered within the question and scaled by their root mean square. Training-column means and scales then standardize the resulting 1,056 features.
 
+Ten scalar features summarize checkable arithmetic, such as the fraction of incorrect equalities and whether the final answer appears in a calculation. The other 22 describe the answer and literal number sources: numbers found in the question or earlier calculations, new numbers, sign, size and denominator. These checks provide evidence about a solution without fully interpreting it.
 
----
+The model fits candidate correctness with binary cross-entropy (BCE). Its L2 penalties are 0.05 for representation features and 0.003 for scalar features. Float64 L-BFGS runs for at most 350 iterations. Candidates with the same parsed answer receive a group score:
 
+```text
+group score = highest logit in the group + 0.5 log(group size)
+```
 
-2. A standalone relative verifier
+The count term gives repeated answers a modest advantage while allowing a strong minority answer to win. Six pairs of L2 penalties and count bonuses of 0, 0.5 and 1 were compared on validation.
 
-The first component is a logistic verifier independently fitted from scratch. Its design follows the publicly described relative-verifier combination [2]. No weights, prediction caches, datasets, or per-question test results from that repository are used. The feature implementation is shared by fitting and inference.
+### Neural verifiers
 
-Representation and 32 scalar signals
+Training statistics standardize the representations, followed by full-dimensional ZCA whitening with ridge 0.1. The network reads both this vector and its centered, normalized version within the question, together with the scalar features. Values are clipped to [-6, 6].
 
-c_i = e_i - mean_j(e_j)<br/>r_i = c_i / (mean_j ||c_j||_2 + 1e-6)<br/>u_i = (f_i - mean_j(f_j)) / (RMS_j(f_j - mean_j(f_j)) + .001)<br/>x_i = concatenate(r_i, u_i)   # 1,024 + 32 dimensions
+The network has eight members that share projection matrices and have their own input/output scales, following the efficient-ensemble idea in TabM [3]. Each member has width 128. One attention block compares the four candidates, with a learned same-answer bias, residual connections and layer normalization. Its feedforward block has dimensions 128-256-128. Candidate positions have no learned embeddings. Set attention is motivated by [4].
 
-Ten arithmetic features describe the number of checkable equalities, incorrect-equality fraction and positions, exact-equality fraction, and whether the final answer occurs on a checked left or right side. Twenty-two answer/source features describe literal numbers matching the question or previous computed values, new numbers, answer integrality, sign, size, denominator, and count/money cues. These are fallible pattern checks: literal matching does not bind objects, units, or times, and an intermediate contradiction does not imply a wrong final answer.
+For scores s, the two objectives are:
 
-Each question is transformed using only its own four candidates. Column means and standard deviations are then learned from the 2,114 training disagreement groups (8,456 candidate rows); invalid endings receive negative candidate labels here. The column scale is standard deviation plus 1e-6. This per-question scaling and the subsequent fitted normalization affect training and regularization. Merely subtracting a common mean would not, by itself, change a fixed linear ranking.
+```text
+Mass:     logsumexp(s over valid candidates)
+        - logsumexp(s over correct candidates)
+Pairwise: mean softplus(s_wrong - s_correct)
+```
 
-Fitting and answer aggregation
+Both add 0.1 times valid-candidate BCE and average the loss over members. Training uses AdamW (learning rate 0.001, weight decay 0.03), dropout 0.25, batches of 128 questions, at most 150 epochs and patience 20. Seeds 17, 29 and 43 were compared. The submitted mass model uses seed 17, epoch 30; the pairwise model uses seed 29, epoch 38.
 
-loss = mean BCE(x_i @ w + b, y_i) + .5 * sum_d lambda_d * w_d^2<br/>lambda_embedding = .05; lambda_scalar = .003<br/>answer_score(a) = max_{i: answer_i=a} logit_i + .5 * log(count(a))
+### Score combination
 
-Fitting uses float64 L-BFGS, maximum 350 iterations, with an unpenalized bias. Six predeclared block-penalty combinations were compared: embedding .01/.05/.2 and scalar .003/.01. The log-count bonus 0/.5/1 was evaluated on validation. The selected combination is .05/.003 with bonus .5. This is joint fitting of all 1,056 columns, with a different prior scale for the two feature blocks. The final group score is based on raw logits, not sigmoid probabilities.
+Let L be the linear group scores, M the mass-model scores and P the pairwise scores. Z standardizes valid candidate scores within the current question, with a minimum standard deviation of 1e-6:
 
-Candidates with the same parsed answer receive the same group score; any member earns the same official point. Invalid answers are excluded when a valid candidate exists. The implementation ignores IDs and does not contain an answer lookup. The reference parser is imported from the supplied code without modifications.
+```text
+B = 0.5 Z(L) + 0.5 Z(M)
+Final score = 0.5 Z(B) + 0.5 Z(P)
+```
 
+The neural logits are averaged over their eight members. The second normalization matters: this is not a direct 0.25L + 0.25M + 0.5P sum. The program chooses the highest final score and excludes invalid answers whenever a valid candidate exists.
 
----
+<!-- pagebreak -->
 
+## 3. What the comparisons showed
 
-3. Neural comparators and the exact frozen combination
+The recent experiments used the same training and validation splits throughout. Neural epochs were selected by validation disagreement accuracy, with validation loss breaking ties. The following counts use the saved development scores; neural scores in this comparison were computed on GPU. Rows show selected settings, not averages over seeds.
 
-The neural components also start from random parameters. Fit-only statistics standardize the original representations; a full-dimensional ZCA transform uses eigenvalues of the training covariance with ridge .1. Both the absolute transformed vector and a within-question centered/RMS-normalized view enter the network, alongside the same 32 scalar signals. Preprocessed values are clipped to [-6,6]. No PCA truncation or validation-fitted statistic is used.
+| Method | Correct / 355 | Accuracy |
+| --- | --- | --- |
+| Relative linear verifier L | 305 | 85.92% |
+| Independent candidate network | 308 | 86.76% |
+| Joint mass model M | 305 | 85.92% |
+| Joint pairwise model P | 305 | 85.92% |
+| Joint answer-group objective | 308 | 86.76% |
+| Two-model combination B | 309 | 87.04% |
+| Final combination, development scores | 309 | 87.04% |
+| Final combination, deployed CPU | 308 | 86.76% |
 
-Eight members share main projection matrices, with trainable member-specific input/output scalings and independent member losses, inspired by BatchEnsemble/TabM [3]. Each member has width 128. One self-attention block compares the four candidates, includes a learned same-answer bias, and uses residual connections, layer normalization, and a 128-256-128 feedforward block. There are no candidate-position embeddings. This is a compact task adaptation, not a reproduction of official TabM benchmark results. Set attention supplies a model class for comparing candidates, not a guarantee of mathematical understanding. [4]
+The clearest gain came from combining L and M: removing either component reduced the count from 309 to 305. The two models made different mistakes, even though neither was the best standalone network. This ablation supports combining these components on this validation split.
 
-Training setting | Fixed recipe
+The independent network reached 308, above the joint mass model's 305. The answer-group objective also reached 308. Adding the pairwise model tied the two-model combination rather than improving its validation count. Thus the attention models were not stronger on their own. Because seed and epoch choices also varied, these comparisons do not isolate the effect of attention.
 
-Optimizer / learning rate | AdamW / .001
+### CPU deployment
 
-Weight decay / dropout | .03 / .25
+The final CPU run changed one validation choice and scored 308 rather than 309. The largest combined-score difference was 6.79e-7, enough to change a close decision. This was recorded before final test scoring. Weights and combination coefficients were kept unchanged. The report uses 308/355 for the actual CPU implementation.
 
-Batch / maximum / patience | 128 questions / 150 epochs / 20 epochs
+### Official test results
 
-Seeds per neural variant | 17, 29, 43
+| Fixed evaluated version | Correct / 467 | Accuracy |
+| --- | --- | --- |
+| Earlier Gaussian/path model | 385 | 82.44% |
+| Two-model combination B | 396 | 84.80% |
+| Submitted final combination | 399 | 85.44% |
 
-Early stopping | Validation disagreement correct count; loss tie-break
+The final combination was chosen from existing candidates tied at the best validation count, using model size and then name to break ties. Its weights and coefficients were fixed before its test evaluation. It answered three more test questions correctly than B, despite the validation tie.
 
-Submitted neural members | Mass objective seed17; pairwise objective seed29
+Earlier test totals were already known during the project. These are records of successive fixed versions, not independent repetitions on a previously unseen test set. No individual test errors were inspected to design features, and the final score led to no further model changes.
 
-Two outcome objectives
+<!-- pagebreak -->
 
-M: mean_q,k [logsumexp_valid(s_qki) - logsumexp_correct(s_qki)]<br/>P: mean_q,k mean_{p correct, n wrong} softplus(s_qkn - s_qkp)<br/>Each objective also adds .1 * valid-candidate BCE.
+## 4. Computation and reproduction
 
-A separate outcome loss is computed for each member within joint training; their logits are averaged at inference. The submitted mass-objective model selected epoch 30 (50 run); the pairwise model selected epoch 38 (58 run). Invalid candidates are masked from the neural objective. The same preprocessing is exported as NumPy arrays; inference imports neither Torch nor sklearn.
+### Inference
 
-Frozen fusion; Z means valid-candidate standardization
+| Measurement | Recorded value | Course limit |
+| --- | --- | --- |
+| Prediction process | 3.022 s | Included below |
+| Independent scoring process | 0.113 s | Included below |
+| Complete fresh CPU evaluation | 3.136 s | 30 s |
+| All inference assets, uncompressed | 11,808,974 bytes (11.26 MiB) | 16 MiB |
+| Observed total threads | 2, including the monitor | 4 |
 
-S_previous = .5 * Z(L) + .5 * Z(M_seed17)<br/>S_final = .5 * Z(S_previous) + .5 * Z(P_seed29)<br/>Z(s)_i = (s_i - mean_valid(s)) / max(std_valid(s), 1e-6)
+The local processor was a Xeon Platinum 8368Q. Timing includes process startup, imports, data and checkpoint loading, feature extraction and every model. CUDA was hidden; numerical libraries used one thread and CPU affinity was limited to four cores. The reference Xeon 8457C determines official timing eligibility.
 
-L includes its answer-group bonus; the neural group bonuses selected here are zero. The second normalization makes this a nested combination, not simply .25L+.25M+.5P. The frozen checkpoint includes every weight, transform, statistic, and configuration for all three branches. It contains no earlier Gaussian/path weights. Selection returns one Python integer per current input question.
+Inference uses NumPy. The ten checkpoint files contain all weights, preprocessing statistics and configurations. Both stored ZCA transforms are included in the asset count. The official parser and scoring tools are unchanged.
 
+### Training cost
 
----
+| Recent experiment | Fits | Recorded stage time |
+| --- | --- | --- |
+| Linear penalties | 6 | 21.72 s |
+| Independent / joint mass networks | 3 / 3 | 56.33 / 55.85 s |
+| Pairwise / answer-group networks | 3 / 3 | 53.27 / 80.96 s |
 
+The two neural routes in each pair ran concurrently on separate RTX 4090 cards; each fit used one card. These paired times are not added as wall time. The course specifies CPU or one GPU no stronger than a 4090. The concurrent development schedule is disclosed here; it has not been confirmed as an allowed interpretation of that rule.
 
-4. Development comparisons, ablation, and scoring history
+The submitted training command was also run serially on one exposed 4090. It completed these 18 fits in 274.07 seconds and reproduced all ten checkpoint files byte for byte, including all 62 arrays. This confirms the recorded environment, rather than promising identical training on every machine. The successful replay does not change the earlier concurrency disclosure.
 
-The recent model family used the same official training and validation questions for all routes. There was no additional inner holdout gate or artificial learning task. Validation was repeatedly used for early stopping and selection, so the table is adaptive development evidence, not an unbiased estimate of generalization. The neural rows are best-seed/ensemble choices from the predeclared seeds; they are not averages of independent validation replications.
+These costs cover the recent model family. Earlier searches are recorded separately in the repository. Some historical records overlap, so they are not summed into a project total.
 
-Development computation | Correct /355 | Interpretation
+### Reproduction files
 
-Relative logistic L | 305 | Standalone component
+The README gives exact installation, CPU evaluation and single-GPU training commands. Checkpoint evaluation needs no retraining. The official score JSON, resource measurements, seeds and file hashes are included, along with the record of training replay. The entry point remains `predict(bank, arrays, checkpoint)` and returns Python integer indices in input order. It reads the current inputs rather than stored predictions or question IDs.
 
-Independent candidate network | 308 | No candidate-attention block
+<!-- pagebreak -->
 
-Joint mass-objective network M | 305 | Standalone submitted neural branch
+## 5. Discussion
 
-Joint pairwise network P | 305 | Standalone submitted neural branch
+There is a practical reason to keep the linear verifier: it is cheap and makes different choices from the mass model. Evidence for the third branch is weaker. Its three-answer test gain came without a validation gain, so I would not expect the same improvement on a new bank from these results alone.
 
-Direct answer-group CE network | 308 | Alternative objective, not submitted
+### What the model still misses
 
-S_previous: L + M | 309 | Remove final pairwise branch
+Arithmetic checks cannot establish that a solution used the right quantities. In an earlier review of training errors, a candidate correctly computed 8 x 5 = 40 total pieces of wood, then treated 40 as the number of pieces per item. Checking the multiplication does not detect that change in meaning. This example comes from an earlier model's training-error review, not a new error analysis of the final model's test set.
 
-S_final: S_previous + P (GPU cache) | 309 | Validation-tied nominated comparator
+The scalar features match literal numbers and calculations; they do not reliably bind objects, units and times. This leaves room for a solution to make consistent calculations about the wrong quantity. Also, the outcome labels reward a correct final number even when some intermediate steps are faulty. The model's accuracy measures answer selection, not step-by-step mathematical verification.
 
-S_final: frozen CPU replay | 308 | Actual deployment; full validation 751/798
+Validation contains only 355 disagreement questions and was used for epoch, seed, penalty and combination choices. That limits confidence in small gains. A separate audit bank could reverse the ranking of these models. The results also do not establish that reading full reasoning text is better than using only final answers: that information-source comparison was not isolated in this model family.
 
-Removing either branch of S_previous reduces the cached development count from 309 to 305. This supports complementarity for that comparison, but does not isolate a causal benefit of reasoning-text features or attention: the independent network itself reached 308. Adding P did not improve cached validation accuracy and reduced the CPU count by one. Thus the final model is not described as a consistent validation improvement.
+### Assistance and reuse
 
-Numerical deployment difference
+OpenAI Codex assisted method comparison, implementation, training orchestration, debugging and writing. The relative-verifier design follows [2], implemented independently; its published 394/467 total was known. Its weights, data and individual test predictions were not used. The networks use ideas from TabM and set attention [3,4], with all parameters trained from scratch on course data. No external data, additional pretrained weights or AI-generated semantic labels were used. Course parser/scorer code and GSM8K/Qwen attribution are retained.
 
-Before final test scoring, the frozen CPU validation run returned 308 disagreement answers rather than the GPU cache's 309. A validation-only comparison found a maximum raw pairwise-score difference of 3.41e-06 and combined-score difference of 6.79e-07; one near-boundary choice changed. The discrepancy was recorded and no weight, inference source, or fusion coefficient was changed to recover that point. The reported validation result uses the actual CPU run.
+### References
 
-Frozen test records and their limits
+[1] X. Wu. DASE7506 MP2: Selecting Reliable LLM Reasoning. Fall 2026. [Official guide](https://github.com/xudongwu-0/DASE7506-MP2/blob/main/guide/GUIDE.md), accessed 31 October 2026.
 
-Fixed evaluated version | Complete test
+[2] Anchmy. [dase7506-mp2-group-relative-verifier](https://github.com/Anchmy/dase7506-mp2-group-relative-verifier/tree/08813bf6ad85fea5242fc40392f25dd8ba26e1cf), commit 08813bf6ad85fea5242fc40392f25dd8ba26e1cf.
 
-Earlier Gaussian/path baseline | 385/467 = 82.4411%
+[3] Y. Gorishniy, A. Kotelnikov and A. Babenko. TabM: Advancing Tabular Deep Learning with Parameter-Efficient Ensembling. ICLR 2025. [arXiv:2410.24210](https://arxiv.org/abs/2410.24210).
 
-S_previous | 396/467 = 84.7966%
-
-Submitted S_final | 399/467 = 85.4390%
-
-After the second finite validation comparison did not beat 309, a validation-tied non-incumbent comparator was nominated for final scoring using the existing validation/asset/name rule. Its checkpoint and source were frozen before that test. S_final gained three net correct answers on this bank, but the split disagreement and small difference do not establish a robust improvement on new questions. Earlier test totals were already known; this is iterative coursework development, not a pristine single-shot holdout study. No test-error analysis, per-question answer lookup, or parameter change after the final score was performed.
-
-
----
-
-
-5. Resources, costs, and reproduction
-
-Item | Recorded value
-
-Inference asset files | All files under inference/checkpoint
-
-Uncompressed assets | 11,808,974 bytes / 16,777,216-byte limit
-
-Fresh prediction | 3.021534 seconds
-
-Independent scoring | 0.112892 seconds
-
-Combined fresh-process wall time | 3.136154 seconds / 30-second limit
-
-CPU / observed total threads | Xeon8368Q / 1 child + 1 monitor = 2
-
-Reference eligibility | Xeon8457C determines official timing qualification
-
-Timing includes process startup, imports, data/asset loading, preprocessing, every branch, and the separate scorer. CUDA is hidden, each library is limited to one thread, and CPU affinity is restricted to four cores. OS thread counts are sampled. The two ZCA assets are counted separately; compression is not used to reduce the declared asset total. No dataset, references, embedding bank, or prediction cache is distributed with the release.
-
-Recent development stage | Real fits | Stage wall seconds
-
-Relative penalty comparison | 6 | 21.723
-
-Independent / joint mass networks | 3 + 3 | 56.333 / 55.852 (concurrent)
-
-Pairwise / answer-group objectives | 3 + 3 | 53.267 / 80.961 (concurrent)
-
-These 18 fits describe the recent submitted-family development stage, not the entire multi-day project. Earlier exploratory costs are retained in historical_search_cost_records.json; overlapping stage records and heterogeneous fit units are not added into a fictitious total. Each fit used one RTX 4090; two independent development jobs ran concurrently. The submission replay uses one exposed RTX 4090 and serial fits; no distributed training is used.
-
-Clean training replay and frozen-checkpoint reproduction
-
-The packaged entry was exercised in a new server directory using only supplied train/validation files, one RTX 4090, and no original weights as training initialization. It completed 18 serial fits in 274.072 seconds. All 10 checkpoint files and all 62 arrays were byte/exactly identical to the frozen version on this same machine. The first launcher attempt failed before any fit because the runs parent was absent; only directory creation was fixed. No new test scoring was run. This verifies this same-environment replay, not universal bitwise reproducibility across hardware. The distributed checkpoint remains the originally scored version.
-
-python scripts/check_release.py --ready-to-submit<br/># Exact evaluation and training commands are in README.md.
-
-README.md provides the exact dependency installation and single-GPU training commands. Sources, asset hashes, official scorer JSON, environment, selection history, and AI disclosure are included. The model freeze begins 4ab3279f6f968f80; its complete SHA is preserved in all evaluation and release records.
-
-
----
-
-
-6. Interpretation, limitations, and assistance
-
-What the comparisons support
-
-A fast, regularized relative model already captures substantial correctness information. A randomly initialized joint model can supply complementary rankings, even when its standalone validation result is lower than an independent network. The useful empirical unit here is the full scoring computation and its cost. The results do not show that adding attention alone improves accuracy, that every extra branch helps, or that more flexible networks understand the mathematical conditions.
-
-The remaining errors can involve missing conditions, object confusion, or requested-time mismatch while local arithmetic is consistent. The scalar extractor uses surface arithmetic and literal number provenance, so it cannot certify those semantics. Outcome labels also allow locally flawed reasoning to end in a correct number. No step-level correctness claim is made, and no new test cases were inspected to support a broader failure taxonomy.
-
-Selection and generalization limits
-
-Only 355 development disagreements support repeated epoch, seed, penalty, and fusion comparisons. Small selected gains can reflect this reuse. The current candidate was validation-tied in the GPU cache and one point lower on the deployed CPU; its three-answer test gain is descriptive evidence on a fixed course bank. An independent audit bank may rank the models differently. The official constraints and automated checkpoint review remain applicable. [1]
-
-AI assistance and reuse
-
-OpenAI Codex substantially assisted method comparison, independent implementation, training orchestration, debugging, deployment checks, packaging, and this report. The student is responsible for understanding and reviewing the implementation. No AI-generated semantic annotations were used as training labels. The relative-verifier design is credited to the public repository [2]; its published 394/467 aggregate was known, but its weights, data, test predictions, and individual test errors were not used. The supplied course IO/parser/scorer are unchanged, and GSM8K/Qwen attribution is retained in LICENSE.txt and NOTICE.txt.
-
-References
-
-[1] X. Wu. DASE7506 MP2: Selecting Reliable LLM Reasoning, Fall 2026. Official task/data version bb801f4f2e7629d270df765ab12c333b2dc616bb. <link href="https://github.com/xudongwu-0/DASE7506-MP2/blob/main/guide/GUIDE.md" color="#087E8B">Official guide</link>. Accessed 31 October 2026.
-
-[2] Anchmy. dase7506-mp2-group-relative-verifier, commit 08813bf6ad85fea5242fc40392f25dd8ba26e1cf. <link href="https://github.com/Anchmy/dase7506-mp2-group-relative-verifier/tree/08813bf6ad85fea5242fc40392f25dd8ba26e1cf" color="#087E8B">Method design source</link>. Independent implementation in this release.
-
-[3] Y. Gorishniy, A. Kotelnikov, A. Babenko. TabM: Advancing Tabular Deep Learning with Parameter-Efficient Ensembling. ICLR 2025. <link href="https://arxiv.org/abs/2410.24210" color="#087E8B">arXiv:2410.24210</link>.
-
-[4] J. Lee, Y. Lee, J. Kim, A. Kosiorek, S. Choi, Y. W. Teh. Set Transformer: A Framework for Attention-based Permutation-Invariant Neural Networks. ICML 2019, PMLR 97:3744-3753. <link href="https://proceedings.mlr.press/v97/lee19d.html" color="#087E8B">PMLR paper</link>.
-
-Evidence: evaluation/test-score.json, test-resources.json, validation-score.json; evidence/selection_before_test.json, validation_export_difference.json, initial_validation_selection.json, objective_validation_selection.json; CHECKPOINT_MANIFEST.json and RELEASE_MANIFEST.json. The prediction method does not read these evidence files.
+[4] J. Lee et al. Set Transformer: A Framework for Attention-based Permutation-Invariant Neural Networks. ICML 2019, PMLR 97:3744-3753. [Paper](https://proceedings.mlr.press/v97/lee19d.html).

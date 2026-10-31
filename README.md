@@ -1,14 +1,16 @@
-# DASE7506 MP2: Relative and Joint Verifiers
+# DASE7506 MP2: Choosing among four mathematical solutions
 
-**Official test: 399/467 = 85.4389721627409%.** Submit the accuracy field from `evaluation/test-score.json`. Frozen CPU validation is 751/798, including 308/355 disagreement questions. The report is `report/MP2_Report.pdf`.
+This repository contains the model that answered **399/467 test questions correctly (85.4390%)**, its training code, complete checkpoint and [five-page report](report/MP2_Report.pdf). The editable report is [here](report/MP2_Report.md).
 
-Release ID: **mp2-85.4390-4ab3279f**. Inference freeze: `4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9`. Original inference source and weights under `inference/` are unchanged. 中文上传步骤见 `UPLOAD_CHECKLIST_ZH.md`。This package does not publish or submit an entry.
+The method combines a linear verifier with two small neural verifiers. It uses the supplied candidate representations and arithmetic/number-source features. Inference runs on CPU with NumPy; it does not need an LLM or a network connection.
 
-## Install and obtain the data
+## Reproduce the score
 
-Use Linux and Python 3.12 (observed: 3.12.15). CPU inference needs NumPy only.
+The recorded environment is Linux, Python 3.12.15 and NumPy 2.5.3. From a Linux terminal:
 
 ```sh
+git clone https://github.com/Fanmili-5/dase7506-mp2.git
+cd dase7506-mp2
 python3.12 -m venv .venv
 . .venv/bin/activate
 python -m pip install -r requirements-inference.txt
@@ -16,42 +18,21 @@ python scripts/check_release.py --ready-to-submit
 
 git clone https://github.com/xudongwu-0/DASE7506-MP2.git ../mp2-official
 git -C ../mp2-official checkout bb801f4f2e7629d270df765ab12c333b2dc616bb
-```
 
-No banks, references, embeddings or prediction caches are redistributed. The official IO/parser/scorer are unchanged and their hashes are checked against the original release.
-
-## Reproduce the frozen score without training
-
-All assets are in `inference/checkpoint/`. If using the separate checkpoint ZIP, unzip it into `inference/` so `inference/checkpoint/config.json` exists.
-
-```sh
 python scripts/evaluate_direct_selected_20261031.py \
   --snapshot inference --split test --final-test \
   --data-dir ../mp2-official/code/data --output runs/test_reproduction
 ```
 
-The command verifies the freeze and runs the original predictor and independent scorer in two fresh CPU processes. It hides CUDA, limits threads and affinity, measures startup/loading/preprocessing/all branches, and preserves existing outputs. Prediction cannot read references. Use a new output directory for another reproduction.
+The evaluation command runs the unchanged official predictor and scorer in separate fresh CPU processes. It disables CUDA, sets numerical libraries to one thread, restricts CPU affinity, and monitors the complete time and thread count. The predictor cannot open the reference-answer file. Use a new output directory for another run.
 
-For direct official CLI reproduction, apply the same limits and time both processes:
+The expected result is `correct=399`, `n=467` and `accuracy=85.4389721627409`. The preserved official result is [evaluation/test-score.json](evaluation/test-score.json).
 
-```sh
-export CUDA_VISIBLE_DEVICES=""
-export OMP_NUM_THREADS=1 OMP_THREAD_LIMIT=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
-export NUMEXPR_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 BLIS_NUM_THREADS=1 GOTO_NUM_THREADS=1
-python inference/code/predict.py \
-  --method inference/methods/improvement_selected_verifier.py \
-  --checkpoint inference/checkpoint --split test \
-  --data-dir ../mp2-official/code/data --output runs/test-predictions.json
-python inference/code/score_predictions.py --split test \
-  --data-dir ../mp2-official/code/data \
-  --predictions runs/test-predictions.json --output runs/test-score.json
-```
-
-The preserved complete fresh-process measurement is **3.136154 seconds**, **11,808,974 uncompressed asset bytes**, with two observed threads including the monitor, on Xeon 8368Q. Limits: 30 seconds, 16 MiB, four total threads; reference Xeon 8457C determines eligibility. Use the monitored entry for the recorded resource check.
+All ten checkpoint files are already in `inference/checkpoint/`. They can also be downloaded as a [complete ZIP](https://github.com/Fanmili-5/dase7506-mp2/releases/download/mp2-85.4390/MP2_checkpoint_85_4390_20261031.zip). If using the ZIP, unpack it into `inference/`, giving `inference/checkpoint/config.json`. It is the same checkpoint as the repository copy. No training is needed for evaluation.
 
 ## Reproduce training
 
-Training uses supplied train labels; validation supports early stopping and selection. There are no external data/weights or test labels in fitting.
+With the virtual environment above active, install Torch and expose one GPU no stronger than an RTX 4090:
 
 ```sh
 python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu126
@@ -60,21 +41,39 @@ CUDA_VISIBLE_DEVICES=0 python scripts/reproduce_extended_training.py \
   --data-dir ../mp2-official/code/data --output runs/training_reproduction
 ```
 
-Expose one GPU no more powerful than an RTX 4090. The entry copies train/validation inputs into a new workspace, serially replays six logistic plus twelve neural fits, then assembles the already chosen configuration. It never scores test or replaces released weights. The submission launcher fixes the missing runs-parent directory; the original failure occurred before its first fit. A clean single-GPU replay completed in **274.071774 seconds**: all **10 checkpoint files were byte-identical**, and all **62 arrays matched exactly**, on the recorded server and dependencies. This is same-environment evidence, not a guarantee across hardware. Results are in `evidence/training_reproduction.json`.
+This runs six linear fits and twelve neural fits serially, then assembles the submitted configuration. It fits only supplied training data and uses validation for early stopping and selection. The replay workspace contains train/validation inputs only; it does not score test or replace the released checkpoint.
 
-Original development sources are in `training/`. Only host/UUID guards are made portable in the replay workspace; numerical recipes, seeds, preprocessing, losses and early stopping stay unchanged. It reconstructs this submitted family/configuration, not the earlier Gaussian/path project. Fresh weights do not automatically inherit a score; the attached original frozen checkpoint is the authority for 399/467.
+The command completed in 274.07 seconds on the recorded server. All ten checkpoint files and all 62 arrays matched the released version exactly. Details, including the earlier launcher error and its directory-only fix, are in [training_reproduction.json](evidence/training_reproduction.json). This establishes reproducibility in that environment; other hardware or library versions can change floating-point results.
 
-## Method and evidence
+## Read the implementation
 
-The relative logistic verifier uses 1,024 relative embedding columns plus 32 relative arithmetic/answer-source features, block L2 penalties .05/.003, and answer-group max plus .5 log(count). Neural comparators use train-only standardization/ZCA, absolute and relative views, eight shared-weight members, and one four-candidate attention block. Seeds 17/29/43 were compared. The submitted mass branch is seed 17; pairwise branch is seed 29.
+| Start here | Purpose |
+| --- | --- |
+| [improvement_selected_verifier.py](inference/methods/improvement_selected_verifier.py) | Final score combination and `predict` entry point |
+| [direct_selected_verifier.py](inference/methods/direct_selected_verifier.py) | Two-model combination and per-question normalization |
+| [relative_verifier_selector.py](inference/methods/relative_verifier_selector.py) | Linear verifier and answer grouping |
+| [joint_verifier_selector.py](inference/methods/joint_verifier_selector.py) | NumPy neural inference and preprocessing |
+| [training/](training/) | Training routines and neural model definitions |
 
-```text
-S_previous = 0.5 Z(relative) + 0.5 Z(mass_joint_seed17)
-S_final    = 0.5 Z(S_previous) + 0.5 Z(pairwise_joint_seed29)
-```
+The report explains the losses, seed choices, ablation and limitations. CPU validation is 751/798 overall and 308/355 on disagreement questions. The saved GPU comparison gave 309/355; one close choice changed after CPU deployment. This difference was recorded before the final test and was not adjusted away.
 
-Z standardizes the current question's valid candidate scores. The final comparator was nominated from existing validation-tied options and frozen before testing. GPU-cached validation was 309/355; CPU deployment is 308/355 because a combined-score difference below 1e-6 changed one choice. It was recorded before testing; weights, inference source and fusion coefficients were not adjusted. Earlier test totals were known; the report does not claim a pristine single-shot holdout study.
+## Resources and experiment records
 
-Eighteen fits describe recent family development, with clean replay costs recorded separately. Earlier exploratory costs are historical and non-additive. Development had two concurrent independent single-4090 jobs, never multi-GPU fitting; clean replay is serial on one GPU. Both schedules are disclosed.
+| Item | Recorded result |
+| --- | --- |
+| Complete test prediction plus independent scoring | 3.136154 seconds, Xeon Platinum 8368Q |
+| Inference assets, uncompressed | 11,808,974 bytes (11.26 MiB) |
+| Observed total threads | 2, including the monitor |
+| Successful training replay | 18 serial fits on one RTX 4090 |
 
-`CHECKPOINT_MANIFEST.json` lists every inference asset. `RELEASE_MANIFEST.json` covers code/report/evidence hashes. Evidence is not read by prediction. Preserve `AI_AND_REUSE.md`, `LICENSE.txt`, `NOTICE.txt`, and publish the matching code version/report/complete checkpoint. The student publishes links and creates the official GitHub submission issue.
+The course limits are 30 seconds on the reference Xeon 8457C, 16 MiB of assets and four total threads. Local measurements satisfy these thresholds; reference-machine timing eligibility remains for the instructor to determine.
+
+Original development ran pairs of independent experiments concurrently on two 4090 cards. Each fit used one card; the successful replay was serial on one card. The course's one-GPU rule has not been confirmed to permit the earlier concurrent schedule. The report and [self-review](docs/SELF_REVIEW_20261031.md) retain this point explicitly.
+
+The recent family used 18 fits. Earlier search records are retained separately, with overlap noted rather than treated as an exact total. The [evidence/](evidence/) and [evaluation/](evaluation/) directories contain selection records, costs and official results. [CHECKPOINT_MANIFEST.json](CHECKPOINT_MANIFEST.json) lists the assets; [RELEASE_MANIFEST.json](RELEASE_MANIFEST.json) records the code and document hashes. The predictor does not read these records.
+
+## Attribution
+
+The relative-verifier design follows Anchmy's public implementation, independently reimplemented here. The network uses ideas from TabM and set attention. [AI_AND_REUSE.md](AI_AND_REUSE.md) and the report disclose sources and substantive Codex assistance. Keep [LICENSE.txt](LICENSE.txt) and [NOTICE.txt](NOTICE.txt) with the release.
+
+The inference freeze remains `4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9`. This documentation revision changes the explanation and report, not the model, checkpoint or official score. Supplied raw data and prediction caches are not redistributed.

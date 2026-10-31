@@ -2,8 +2,8 @@
   "student_id": null,
   "accuracy": 85.4389721627409,
   "public_code_url": null,
-  "public_checkpoint_url": null,
+  "public_checkpoint_url": "https://github.com/Fanmili-5/dase7506-mp2/releases/download/mp2-85.4390/MP2_checkpoint_85_4390_20261031.zip",
   "report": "report/MP2_Report.pdf",
   "model_version": "mp2-85.4390-4ab3279f",
-  "note": "Fill personal ID and published URLs on the official website; no submission has been created."
+  "note": "Fill personal ID on official website; use the documentation revision commit URL supplied with the handoff. Code and checkpoint are published; no score issue was created by the assistant."
 }
