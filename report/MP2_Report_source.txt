@@ -146,7 +146,7 @@ The README gives exact installation, CPU evaluation and single-GPU training comm
 
 ## 5. Discussion
 
-There is a practical reason to keep the linear verifier: it is cheap and makes different choices from the mass model. Evidence for the third branch is weaker. Its three-answer test gain came without a validation gain, so I would not expect the same improvement on a new bank from these results alone.
+There is a practical reason to keep the linear verifier: it is cheap and makes different choices from the mass model. Evidence for the third branch is weaker. Compared with B, the final model increased assets from 5.64 to 11.26 MiB and CPU time from 2.696 to 3.136 seconds. Its three-answer test gain came without a validation gain. The extra branch fits the resource budget, but these results alone do not show that its cost would pay off on another bank.
 
 ### What the model still misses
 
