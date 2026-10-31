@@ -1,0 +1,36 @@
+{
+  "state": "complete",
+  "split": "test",
+  "official_score": {
+    "protocol": "dase7506-mp2-open-hard-verifier-v5",
+    "split": "test",
+    "correct": 399,
+    "n": 467,
+    "accuracy": 85.4389721627409,
+    "scoring_seconds": 0.02563664596527815
+  },
+  "official_score_sha256": "9bc9d10fe2467bb4351d4a904f271dfb26484204e436bc135337ddaa81d4df55",
+  "snapshot_freeze_sha256": "4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9",
+  "complete_cpu_seconds": 3.136154294013977,
+  "asset_bytes": 11808974,
+  "processes": [
+    {
+      "tool": "predict.py",
+      "seconds": 3.021533990977332,
+      "sampled_child_threads": 1,
+      "controller_threads": 1,
+      "exit_code": 0
+    },
+    {
+      "tool": "score_predictions.py",
+      "seconds": 0.11289195693098009,
+      "sampled_child_threads": 1,
+      "controller_threads": 1,
+      "exit_code": 0
+    }
+  ],
+  "cpu_model": "Intel(R) Xeon(R) Platinum 8368Q CPU @ 2.60GHz",
+  "reference_machine_qualification": false,
+  "local_resource_pass": true,
+  "no_test_tuning_or_error_analysis": true
+}

@@ -1,0 +1,9 @@
+{
+  "student_id": null,
+  "accuracy": 85.4389721627409,
+  "public_code_url": null,
+  "public_checkpoint_url": null,
+  "report": "report/MP2_Report.pdf",
+  "model_version": "mp2-85.4390-4ab3279f",
+  "note": "Fill personal ID and published URLs on the official website; no submission has been created."
+}

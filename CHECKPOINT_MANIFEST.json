@@ -1,0 +1,47 @@
+{
+  "asset_files": 10,
+  "uncompressed_bytes": 11808974,
+  "limit_bytes": 16777216,
+  "files": {
+    "config.json": {
+      "bytes": 285,
+      "sha256": "8abe4746ff3afdf19726903a8009be143519f919209246a5577b80e4c11f46b1"
+    },
+    "incumbent/config.json": {
+      "bytes": 273,
+      "sha256": "f23a203a9db68c38126e0c11290cab00ee4d357415975930290ccdcd72f52b68"
+    },
+    "incumbent/joint/config.json": {
+      "bytes": 216,
+      "sha256": "57707926b168b07c7e8ba5ac7f779ef28b823f49bf17324d6cbc298325562597"
+    },
+    "incumbent/joint/joint_17.npz": {
+      "bytes": 1682402,
+      "sha256": "106e32d7f3ce6e410e5cb52fa0d0aa910dca1a4cca5e47c5dbd2b54a36bc2062"
+    },
+    "incumbent/joint/preprocessing.npz": {
+      "bytes": 4208360,
+      "sha256": "df23cd5f0ec9004ee8cfe53f2f0e756cd1ae5fe3e28920b10f7dfb0863938d41"
+    },
+    "incumbent/relative/config.json": {
+      "bytes": 120,
+      "sha256": "ec6e19ee8c3f0967bebaa5035b200918ac8c0bf4bc8d72c3e3ac67ab7376b424"
+    },
+    "incumbent/relative/weights.npz": {
+      "bytes": 26314,
+      "sha256": "931afe77c486560572cd100e4a2037fde642d24078a7282777e36fec520481ba"
+    },
+    "pairwise/config.json": {
+      "bytes": 242,
+      "sha256": "ed92c81234b1d2046892c4d7f62b1a22b76182d7a1598da75020fa689f9b84c2"
+    },
+    "pairwise/joint_29.npz": {
+      "bytes": 1682402,
+      "sha256": "22837d466bd5bed09825a3432ec02e6757cdc727c0b145adc969ad68fc5f1c02"
+    },
+    "pairwise/preprocessing.npz": {
+      "bytes": 4208360,
+      "sha256": "df23cd5f0ec9004ee8cfe53f2f0e756cd1ae5fe3e28920b10f7dfb0863938d41"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "format": "mp2-objective-joint-v1",
+  "objective": "pairwise",
+  "mode": "joint",
+  "members": [
+    "joint_29.npz"
+  ],
+  "vote_bonus": 0.0,
+  "validation_hard_correct": 305,
+  "validation_hard_n": 355,
+  "validation_all_correct": 748
+}

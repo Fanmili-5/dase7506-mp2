@@ -1,0 +1,11 @@
+{
+  "release_id": "mp2-85.4390-4ab3279f",
+  "model_freeze_sha256": "4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9",
+  "official_test_score_sha256": "9bc9d10fe2467bb4351d4a904f271dfb26484204e436bc135337ddaa81d4df55",
+  "official_repo": "https://github.com/xudongwu-0/DASE7506-MP2",
+  "official_commit": "bb801f4f2e7629d270df765ab12c333b2dc616bb",
+  "entrypoint": "inference/methods/improvement_selected_verifier.py:predict(bank, arrays, checkpoint)",
+  "checkpoint_path": "inference/checkpoint",
+  "published_git_commit": null,
+  "published_or_submitted": false
+}

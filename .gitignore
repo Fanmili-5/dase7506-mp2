@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+runs/
+tmp/
+inference/code/data/
+.DS_Store

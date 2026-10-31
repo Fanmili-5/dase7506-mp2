@@ -1,0 +1,29 @@
+{
+  "state": "frozen_before_final_score",
+  "candidate": {
+    "name": "incumbent_0.5_pairwise",
+    "components": [
+      [
+        "incumbent",
+        0.5
+      ],
+      [
+        "pairwise",
+        0.5
+      ]
+    ],
+    "validation_hard_correct": 309,
+    "validation_hard_n": 355,
+    "validation_all_correct": 752,
+    "validation_all_n": 798,
+    "rescued_vs_incumbent": 5,
+    "lost_vs_incumbent": 5,
+    "conservative_asset_bytes": 11810737,
+    "within_asset_limit": true
+  },
+  "asset_bytes": 11808974,
+  "snapshot": "runs/tj_extension_comparator_final_20261031_v1/snapshot",
+  "freeze_sha256": "4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9",
+  "new_fits": 0,
+  "test_opened": false
+}

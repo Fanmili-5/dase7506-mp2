@@ -1,0 +1,16 @@
+{
+  "python": "3.12.15 (main, Oct 13 2026, 16:52:04) [GCC 15.3.0]",
+  "numpy": "2.5.3",
+  "torch": "2.8.0+cu126",
+  "real_fits": 18,
+  "hardware": "independent single RTX4090 jobs, two concurrent GPUs explicitly authorized by user; no multi-GPU fit",
+  "replay_entry_status": "complete; 18 serial fits on one RTX 4090, 274.071774 seconds",
+  "real_fits_scope": "18 recent-family development fits; earlier historical search excluded",
+  "replay_checkpoint_parity": {
+    "files_byte_identical": 10,
+    "arrays_exact": 62,
+    "max_abs_error": 0.0,
+    "scope": "recorded same server/environment"
+  },
+  "test_scored_during_replay": false
+}

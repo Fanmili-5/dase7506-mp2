@@ -1,0 +1,6 @@
+{
+  "format": "mp2-standalone-relative-v1",
+  "vote_bonus": 0.5,
+  "lambda_embedding": 0.05,
+  "lambda_scalar": 0.003
+}

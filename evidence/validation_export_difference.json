@@ -1,0 +1,10 @@
+{
+  "source": "validation_only_CPU_deployment_vs_GPU_cached_export",
+  "pairwise_raw_max_abs_error": 3.4121008445353596e-06,
+  "mixture_max_abs_error": 6.788785994471525e-07,
+  "choice_differences": 1,
+  "cached_hard_correct": 309,
+  "cpu_hard_correct": 308,
+  "weights_sources_or_coefficients_changed": false,
+  "test_opened": false
+}

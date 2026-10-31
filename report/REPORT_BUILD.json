@@ -1,0 +1,11 @@
+{
+  "pages": 6,
+  "sha256": "722d1ac9f22c5c96dd612f896cc1b5a082a2e2d271f05030fe48e05cffcc70a7",
+  "bytes": 20249,
+  "built_from": "scripts/build_submission_report.py",
+  "visual_inspection": "all six rendered pages checked; corrected page 3 checked again",
+  "visual_inspection_passed": true,
+  "text_and_metric_checks": "passed",
+  "reportlab": "4.4.9",
+  "author_student_id": "not supplied; fill student ID on official website"
+}

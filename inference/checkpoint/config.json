@@ -1,0 +1,16 @@
+{
+  "format": "mp2-objective-extension-selected-v1",
+  "normalize_components": true,
+  "components": [
+    {
+      "family": "incumbent",
+      "path": "incumbent",
+      "weight": 0.5
+    },
+    {
+      "family": "objective",
+      "path": "pairwise",
+      "weight": 0.5
+    }
+  ]
+}

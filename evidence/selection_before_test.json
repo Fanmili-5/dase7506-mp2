@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "name": "incumbent_0.5_pairwise",
+    "components": [
+      [
+        "incumbent",
+        0.5
+      ],
+      [
+        "pairwise",
+        0.5
+      ]
+    ],
+    "validation_hard_correct": 309,
+    "validation_hard_n": 355,
+    "validation_all_correct": 752,
+    "validation_all_n": 798,
+    "rescued_vs_incumbent": 5,
+    "lost_vs_incumbent": 5,
+    "conservative_asset_bytes": 11810737,
+    "within_asset_limit": true
+  },
+  "selection_source_sha256": "8fe7ef1b8c092e08781bdbaad99e3fedab4242c4b797803b84d8d51fdc3eadba",
+  "rule": "highest existing validation accuracy among non-incumbent candidates, then asset bytes/name",
+  "user_authorized_final_scoring_despite_validation_tie": true,
+  "no_new_training_or_test_based_selection": true,
+  "original_gain_gate_relaxed_by_latest_user_request": true
+}

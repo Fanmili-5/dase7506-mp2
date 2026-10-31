@@ -1,0 +1,16 @@
+{
+  "format": "mp2-direct-selected-verifier-v1",
+  "components": [
+    {
+      "family": "relative",
+      "path": "relative",
+      "weight": 0.5
+    },
+    {
+      "family": "neural",
+      "path": "joint",
+      "weight": 0.5
+    }
+  ],
+  "normalize_components": true
+}
