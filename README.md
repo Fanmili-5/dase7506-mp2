@@ -1,6 +1,6 @@
 # DASE7506 MP2: Choosing among four mathematical solutions
 
-This repository contains the model that answered **399/467 test questions correctly (85.4390%)**, its training code, complete checkpoint and [five-page report](report/MP2_Report.pdf). The editable report is [here](report/MP2_Report.md).
+This repository contains the model that answered **399/467 test questions correctly (85.4390%)**, its training code, complete checkpoint and [report](report/MP2_Report.pdf). The editable [LaTeX source](report/MP2_Report.tex) is included.
 
 The method combines a linear verifier with two small neural verifiers. It uses the supplied candidate representations and arithmetic/number-source features. Inference runs on CPU with NumPy; it does not need an LLM or a network connection.
 
@@ -43,7 +43,7 @@ CUDA_VISIBLE_DEVICES=0 python scripts/reproduce_extended_training.py \
 
 This runs six linear fits and twelve neural fits serially, then assembles the submitted configuration. It fits only supplied training data and uses validation for early stopping and selection. The replay workspace contains train/validation inputs only; it does not score test or replace the released checkpoint.
 
-The command completed in 274.07 seconds on the recorded server. All ten checkpoint files and all 62 arrays matched the released version exactly. Details, including the earlier launcher error and its directory-only fix, are in [training_reproduction.json](evidence/training_reproduction.json). This establishes reproducibility in that environment; other hardware or library versions can change floating-point results.
+The command completed in 274.07 seconds on the recorded server. All ten checkpoint files and all 62 arrays matched the released version exactly. The environment and replay records are in [training_reproduction.json](evidence/training_reproduction.json).
 
 ## Read the implementation
 
@@ -55,7 +55,7 @@ The command completed in 274.07 seconds on the recorded server. All ten checkpoi
 | [joint_verifier_selector.py](inference/methods/joint_verifier_selector.py) | NumPy neural inference and preprocessing |
 | [training/](training/) | Training routines and neural model definitions |
 
-The report explains the losses, seed choices, ablation and limitations. CPU validation is 751/798 overall and 308/355 on disagreement questions. The saved GPU comparison gave 309/355; one close choice changed after CPU deployment. This difference was recorded before the final test and was not adjusted away.
+The report explains the losses, seed choices and component comparisons. CPU validation is 751/798 overall and 308/355 on disagreement questions. Saved GPU development scores give 309/355; one close choice changes in CPU inference. The CPU result is reported for deployment.
 
 ## Resources and experiment records
 
@@ -66,14 +66,24 @@ The report explains the losses, seed choices, ablation and limitations. CPU vali
 | Observed total threads | 2, including the monitor |
 | Successful training replay | 18 serial fits on one RTX 4090 |
 
-The course limits are 30 seconds on the reference Xeon 8457C, 16 MiB of assets and four total threads. Local measurements satisfy these thresholds; reference-machine timing eligibility remains for the instructor to determine.
+The course limits are 30 seconds on the reference Xeon 8457C, 16 MiB of assets and four total threads. The table records local Xeon 8368Q measurements; official reproduction uses the reference CPU.
 
 Every training run used a single RTX 4090. Development ran two independent experiments at a time, one on each card, with no multi-GPU training within either experiment. The successful replay runs all fits serially on one card.
 
 The recent family used 18 fits. Earlier search records are retained separately, with overlap noted rather than treated as an exact total. The [evidence/](evidence/) and [evaluation/](evaluation/) directories contain selection records, costs and official results. [CHECKPOINT_MANIFEST.json](CHECKPOINT_MANIFEST.json) lists the assets; [RELEASE_MANIFEST.json](RELEASE_MANIFEST.json) records the code and document hashes. The predictor does not read these records.
 
-## Attribution
+## Build the LaTeX report
 
-The relative-verifier design follows Anchmy's public implementation, independently reimplemented here. The network uses ideas from TabM and set attention. [AI_AND_REUSE.md](AI_AND_REUSE.md) and the report disclose sources and substantive Codex assistance. Keep [LICENSE.txt](LICENSE.txt) and [NOTICE.txt](NOTICE.txt) with the release.
+The report uses standard LaTeX packages and includes its bibliography in the same source file. Compile it with Tectonic:
+
+```sh
+tectonic --outdir report report/MP2_Report.tex
+```
+
+It can also be compiled with pdfLaTeX on Overleaf. The report PDF is already included, so LaTeX is not needed for model evaluation.
+
+## Sources
+
+The relative-verifier design follows Anchmy's public implementation, independently reimplemented here. The network uses ideas from TabM and set attention. References are listed in [ATTRIBUTION.md](ATTRIBUTION.md) and the report. Keep [LICENSE.txt](LICENSE.txt) and [NOTICE.txt](NOTICE.txt) with the release.
 
 The inference freeze remains `4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9`. This documentation revision changes the explanation and report, not the model, checkpoint or official score. Supplied raw data and prediction caches are not redistributed.

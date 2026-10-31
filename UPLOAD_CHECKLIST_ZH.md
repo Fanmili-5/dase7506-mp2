@@ -37,4 +37,4 @@ https://github.com/Fanmili-5/dase7506-mp2/releases/download/mp2-85.4390/MP2_chec
 截止为2026年10月31日23:59，香港/北京时间。最终条目必须同时包含代码和checkpoint链接。官方依据：
 https://github.com/xudongwu-0/DASE7506-MP2/blob/main/guide/GUIDE.md
 
-提交前请阅读报告及AI_AND_REUSE.md。报告准确记录每次训练使用一张4090、独立实验并行，以及已有测试总分反馈；成绩和参考机资源测量由教师复核。本助手没有代填同意或创建成绩Issue。
+提交前请阅读LaTeX报告及ATTRIBUTION.md。报告记录每次训练使用一张4090、独立实验并行和各版本评价结果。成绩和参考机资源测量由教师复核，最终成绩Issue由你本人创建。

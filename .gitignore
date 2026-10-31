@@ -5,3 +5,10 @@ runs/
 tmp/
 inference/code/data/
 .DS_Store
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.synctex.gz
+report/*.fls
+report/*.fdb_latexmk

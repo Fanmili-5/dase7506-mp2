@@ -1,12 +1,13 @@
 {
+  "format": "LaTeX",
+  "source": "report/MP2_Report.tex",
+  "source_sha256": "341c7848c44409d66321f08f74e54801741ed7fae07e350b6504fbafe272e9d0",
+  "sha256": "a772f84776a6a1666a009434278838ec84af1c7fae6d0c315e070f1c6a27a879",
+  "bytes": 56353,
   "pages": 5,
-  "sha256": "a7954f9893b6cec2f28ff8465d1665812d4ad6b1c2a63dccf78b307b5123e6fc",
-  "bytes": 16302,
-  "built_from": "report/MP2_Report.md via scripts/build_submission_report.py",
-  "visual_inspection": "corrected page 4 rendered and inspected; other four pages text-identical to previously inspected report",
+  "compiler": "Tectonic 0.17.0",
   "visual_inspection_passed": true,
+  "visual_inspection": "all five compiled LaTeX pages rendered and inspected",
   "text_and_metric_checks": "passed",
-  "reportlab": "4.4.9",
-  "documentation_revision": "readability-v2",
-  "base_code_commit": "ad0982a3aff4696b4c1788122fe94070db0aef96"
+  "acknowledgement_sentences": 1
 }

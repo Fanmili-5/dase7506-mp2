@@ -7,8 +7,10 @@
   "entrypoint": "inference/methods/improvement_selected_verifier.py:predict(bank, arrays, checkpoint)",
   "checkpoint_path": "inference/checkpoint",
   "published_or_submitted": true,
-  "documentation_revision": "readability-v2",
+  "documentation_revision": "latex-final",
   "repository": "https://github.com/Fanmili-5/dase7506-mp2",
   "model_source_base_commit": "ad0982a3aff4696b4c1788122fe94070db0aef96",
-  "score_submitted_by_assistant": false
+  "score_submitted_by_assistant": false,
+  "report_source": "report/MP2_Report.tex",
+  "report_format": "LaTeX"
 }

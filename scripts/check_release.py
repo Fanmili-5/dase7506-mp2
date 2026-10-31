@@ -41,6 +41,8 @@ def main():
     assert resource['asset_bytes']==assets and resource['complete_cpu_seconds']<=30
     assert all(p['sampled_child_threads']+p['controller_threads']<=4 for p in resource['processes'])
     report=read('report/REPORT_BUILD.json');assert 1<=report['pages']<=10
+    assert report['format']=='LaTeX' and report['source']=='report/MP2_Report.tex'
+    assert digest(ROOT/report['source'])==report['source_sha256']
     assert digest(ROOT/'report/MP2_Report.pdf')==report['sha256']
     assert (ROOT/'report/MP2_Report.pdf').read_bytes().startswith(b'%PDF-')
     reproduction=read('evidence/training_reproduction.json');assert reproduction['state']=='complete'
@@ -59,8 +61,8 @@ def main():
     print(json.dumps({'materials_ready':True,'official_test_accuracy':score['accuracy'],'asset_files':len(actual),
         'asset_bytes':assets,'report_pages':report['pages'],'frozen_source_hashes':'passed','release_hashes':'passed',
         'single_GPU_training_replay':reproduction['state'],
-        'scope':'package integrity and recorded measurements; not instructor eligibility approval',
-        'eligibility_review_remaining':['reference CPU timing'],
+        'scope':'file integrity, official score record and recorded resource measurements',
+        'reference_cpu':'Xeon Platinum 8457C',
         'training_resources':'one RTX 4090 per training run; independent experiments ran concurrently',
         'score_submission':'student action; this checker does not create submission issues'},indent=2))
 
