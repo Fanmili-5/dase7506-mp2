@@ -232,8 +232,8 @@
       "sha256": "38b16b3d2f3f458a7bbdc25f2a8782112271f809a7a9c38ec832d331d2872530"
     },
     "methods/relative_verifier_inputs.py": {
-      "bytes": 8709,
-      "sha256": "805d0b8cafcf8a3c4fcab21fc45b4454e15cee953565c25d85672ac26ba8726a"
+      "bytes": 8644,
+      "sha256": "ff0d85e322989a5407aa55e6e390a39e7f3ea22ec69447073c2bbfe3ed8a7d65"
     },
     "methods/relative_verifier_selector.py": {
       "bytes": 919,
@@ -300,5 +300,6 @@
       "sha256": "6097a01411dd282b890d7e3bd48e2a898e3141aa3d2c97d6361c242a6a7d93ac"
     }
   },
-  "selection_record_sha256": "c5ad937239a9536fc4b47edbfcb37521d619aa4ab5e90ef84b5fd85df92cb9b4"
+  "selection_record_sha256": "c5ad937239a9536fc4b47edbfcb37521d619aa4ab5e90ef84b5fd85df92cb9b4",
+  "documentation_revision_of": "4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9"
 }

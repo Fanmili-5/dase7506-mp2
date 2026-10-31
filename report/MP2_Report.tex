@@ -46,11 +46,12 @@ A disagreement question has at least two distinct valid parsed answers. Training
 
 Validation is used for epoch, seed, regularization and combination choices. Earlier fixed-version test totals were available during development. No individual test errors were used to construct features; the final checkpoint and combination coefficients were fixed before its reported test evaluation.
 
+\clearpage
 \section{Method}
 
 \subsection{Relative linear verifier}
 
-The linear baseline compares candidates through relative features. Let $e_i$ be candidate $i$'s representation. Its relative representation is
+Groupwise ranking studies candidate scores that depend on other items in the same group~\cite{groupwise}. Here, the linear baseline represents candidate context through relative features. Let $e_i$ be candidate $i$'s representation. Its relative representation is
 \[
  c_i=e_i-\frac14\sum_{j=1}^4e_j,
  \qquad
@@ -58,9 +59,9 @@ The linear baseline compares candidates through relative features. Let $e_i$ be 
 \]
 There are also 32 scalar features. Ten summarize checkable arithmetic, such as the proportion of incorrect equalities and whether the final answer appears in a calculation. The remaining 22 describe literal number sources and answer properties, including numbers appearing in the question or previous calculations, new numbers, sign, magnitude and denominator. Each scalar is centered and scaled within its question. Training-column statistics then standardize the combined 1,056 features.
 
-Candidate labels indicate whether the parsed answer matches the training reference. The linear model minimizes binary cross-entropy with separate L2 penalties of 0.05 for representation coefficients and 0.003 for scalar coefficients. Float64 L-BFGS runs for at most 350 iterations. Six regularization pairs were fitted, and count bonuses of 0, 0.5 and 1 were compared on validation.
+Candidate labels indicate whether the parsed answer matches the training reference. The linear model minimizes binary cross-entropy with L2 shrinkage, as in ridge regularization~\cite{ridge}, using separate penalties of 0.05 for representation coefficients and 0.003 for scalar coefficients. Float64 L-BFGS runs for at most 350 iterations. Six regularization pairs were fitted, and count bonuses of 0, 0.5 and 1 were compared on validation.
 
-Candidates sharing a parsed answer form a group. For answer $a$, the selected group score is
+Self-consistency uses consensus among final answers to select a solution~\cite{selfconsistency}. For the four fixed candidates here, candidates sharing a parsed answer form a group. For answer $a$, the selected group score is
 \[
  L(a)=\max_{i:\,\hat a_i=a}s_i+0.5\log n_a,
 \]
@@ -193,7 +194,13 @@ The neural models adapt ideas from~\cite{tabm,settransformer}; all parameters ar
 \paragraph{Acknowledgement.}
 OpenAI Codex assisted with implementation, experiment execution, analysis and report preparation.
 
-\begin{thebibliography}{2}
+\begin{thebibliography}{5}
+\bibitem{groupwise} Q. Ai, X. Wang, S. Bruch, N. Golbandi, M. Bendersky and M. Najork. Learning Groupwise Multivariate Scoring Functions Using Deep Neural Networks. ICTIR, pp. 85--92, 2019. \url{https://arxiv.org/abs/1811.04415}.
+
+\bibitem{ridge} A. E. Hoerl and R. W. Kennard. Ridge Regression: Biased Estimation for Nonorthogonal Problems. Technometrics, 12(1):55--67, 1970. \url{https://doi.org/10.1080/00401706.1970.10488634}.
+
+\bibitem{selfconsistency} X. Wang et al. Self-Consistency Improves Chain of Thought Reasoning in Language Models. ICLR, 2023. \url{https://arxiv.org/abs/2203.11171}.
+
 \bibitem{tabm} Y. Gorishniy, A. Kotelnikov and A. Babenko. TabM: Advancing Tabular Deep Learning with Parameter-Efficient Ensembling. ICLR, 2025. \url{https://arxiv.org/abs/2410.24210}.
 
 \bibitem{settransformer} J. Lee et al. Set Transformer: A Framework for Attention-based Permutation-Invariant Neural Networks. ICML, PMLR 97:3744--3753, 2019. \url{https://proceedings.mlr.press/v97/lee19d.html}.

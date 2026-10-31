@@ -1,7 +1,7 @@
 {
   "release_id": "mp2-85.4390-4ab3279f",
   "official_accuracy": 85.4389721627409,
-  "model_freeze_sha256": "4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9",
+  "model_freeze_sha256": "b70773c6176905f39e698ca5c724866a420f79d6cf39599087b04eb9670d4339",
   "files": {
     ".gitignore": {
       "bytes": 174,
@@ -20,12 +20,12 @@
       "sha256": "d577cdf7202ae22f2b19ace348b0ec69958a59aaf51d30cdab902bf7c1e67d78"
     },
     "README.md": {
-      "bytes": 5781,
-      "sha256": "1f1ace41fde69325f161f5591c9e6db73c6354528a495e36839b7314c0cb7476"
+      "bytes": 6145,
+      "sha256": "b670bda8dc9a49d3aba47263b801f61123ff495d53079046030442ef364bd30c"
     },
     "SOURCE_VERSION.json": {
-      "bytes": 722,
-      "sha256": "b898c981f9778da1ea3532a050485d342884f86aa5bb474ecdc512df67b99601"
+      "bytes": 818,
+      "sha256": "fb9afab34c37afd8ebcb63e76f38129c6cf1d3c575882681d13578d010c5017a"
     },
     "TRAINING_ENVIRONMENT.json": {
       "bytes": 640,
@@ -74,6 +74,10 @@
     "evidence/selection_before_test.json": {
       "bytes": 827,
       "sha256": "c5ad937239a9536fc4b47edbfcb37521d619aa4ab5e90ef84b5fd85df92cb9b4"
+    },
+    "evidence/source_revision.json": {
+      "bytes": 13670,
+      "sha256": "174add76996209a8f0a5cbe2983980d6d62e228ec6d87517d7a2081118f93d2d"
     },
     "evidence/training_reproduction.json": {
       "bytes": 17972,
@@ -140,8 +144,8 @@
       "sha256": "fe12b809b82117aea722e5dfef7a55a88950a7cf50c49ec2ea007ea847959960"
     },
     "inference/freeze.json": {
-      "bytes": 11486,
-      "sha256": "4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9"
+      "bytes": 11585,
+      "sha256": "b70773c6176905f39e698ca5c724866a420f79d6cf39599087b04eb9670d4339"
     },
     "inference/methods/annotated_paths_combined.py": {
       "bytes": 903,
@@ -312,8 +316,8 @@
       "sha256": "38b16b3d2f3f458a7bbdc25f2a8782112271f809a7a9c38ec832d331d2872530"
     },
     "inference/methods/relative_verifier_inputs.py": {
-      "bytes": 8709,
-      "sha256": "805d0b8cafcf8a3c4fcab21fc45b4454e15cee953565c25d85672ac26ba8726a"
+      "bytes": 8644,
+      "sha256": "ff0d85e322989a5407aa55e6e390a39e7f3ea22ec69447073c2bbfe3ed8a7d65"
     },
     "inference/methods/relative_verifier_selector.py": {
       "bytes": 919,
@@ -380,16 +384,16 @@
       "sha256": "6097a01411dd282b890d7e3bd48e2a898e3141aa3d2c97d6361c242a6a7d93ac"
     },
     "report/MP2_Report.pdf": {
-      "bytes": 53879,
-      "sha256": "bd45bf40f8edee339eab7bc3f17c7ac83626b7d21a1560c29984acd3b724e0bc"
+      "bytes": 55689,
+      "sha256": "307b6f66c22274f353fa72e65164cc98f73bc9eadb44df5d74a88de7d51f5432"
     },
     "report/MP2_Report.tex": {
-      "bytes": 13408,
-      "sha256": "ec55f02966caefc8b58e75ee5776c23c3dc56949f073e5f8d11ddd99a1e286fa"
+      "bytes": 14330,
+      "sha256": "6a3de3f78f9b784fe982e9fa32d882b37faab95c96703b327c49a6bf8d20c0cb"
     },
     "report/REPORT_BUILD.json": {
-      "bytes": 493,
-      "sha256": "ae081b715d1c10d5cfc3bba5d6f94ec813e3a0e2fc63136a592f61fe93ad63c4"
+      "bytes": 471,
+      "sha256": "7cfd46e2ceea6373fb4bd604e9b98ddb6c9c0c8d4c5c1a8b77a619207569abf3"
     },
     "requirements-inference.txt": {
       "bytes": 13,
@@ -408,8 +412,8 @@
       "sha256": "bae6d622afc31105b419ffb3ae68002efbec272ddba32a5dd555cca10fc620e1"
     },
     "scripts/check_release.py": {
-      "bytes": 4305,
-      "sha256": "b3cd3d93b1c9fc7d1016aecf4d64fcbadda0d5e82df4ab3b00620616da374fe9"
+      "bytes": 6954,
+      "sha256": "ef4349b06de70d83b056c5773a610df135a5076e3b2fc0580849892b55d2a066"
     },
     "scripts/evaluate_direct_selected_20261031.py": {
       "bytes": 5804,
@@ -464,8 +468,9 @@
       "sha256": "49487d7df340f0631bf995ef6ee6f801b45f1ed9f5366cd2f44ceb0753329a55"
     },
     "training/train_relative_direct_20261031.py": {
-      "bytes": 6707,
-      "sha256": "00e0d15431d79e0b00323dbb46b9aab86cfabd57d65676b51142fbe46d56c06f"
+      "bytes": 6598,
+      "sha256": "bf3c1a086c69c248ce55877e7e9fbcfec0679c34f6003a88b116af588ada3661"
     }
-  }
+  },
+  "scored_model_freeze_sha256": "4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9"
 }

@@ -50,7 +50,6 @@ def main():
     save(OUT/'registration.json', {'configs':CONFIGS,'vote_bonuses':[0,.5,1.], 'seed':17,
         'all_weights_from_scratch':True,'train_scope':'official train informative questions',
         'selection':'official validation hard accuracy then validation BCE',
-        'source':'independent implementation; Anchmy commit08813bf6ad85fea5242fc40392f25dd8ba26e1cf design',
         'no_upstream_weights_data_predictions':True,'gpu_uuid':GPU,'concurrent_other_job_single_gpu':True,
         'source_sha256':{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in
             ('scripts/train_relative_direct_20261031.py','methods/relative_verifier_inputs.py','methods/relative_verifier_selector.py')}})

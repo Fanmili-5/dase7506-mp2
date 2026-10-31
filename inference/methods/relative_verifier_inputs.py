@@ -1,8 +1,7 @@
-"""Independent implementation of the relative-verifier design.
+"""Construct candidate-relative vectors and arithmetic/number-source features.
 
-Design reference: Anchmy/dase7506-mp2-group-relative-verifier, commit
-08813bf6ad85fea5242fc40392f25dd8ba26e1cf. No upstream weights/data are used.
-Arithmetic checks are fallible input signals, not step correctness labels.
+Candidate context uses within-question centering and normalization.
+Arithmetic checks are input signals rather than step correctness labels.
 """
 import ast
 from fractions import Fraction

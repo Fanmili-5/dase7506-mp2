@@ -1,13 +1,13 @@
 {
   "format": "LaTeX",
   "source": "report/MP2_Report.tex",
-  "source_sha256": "ec55f02966caefc8b58e75ee5776c23c3dc56949f073e5f8d11ddd99a1e286fa",
-  "sha256": "bd45bf40f8edee339eab7bc3f17c7ac83626b7d21a1560c29984acd3b724e0bc",
-  "bytes": 53879,
+  "source_sha256": "6a3de3f78f9b784fe982e9fa32d882b37faab95c96703b327c49a6bf8d20c0cb",
+  "sha256": "307b6f66c22274f353fa72e65164cc98f73bc9eadb44df5d74a88de7d51f5432",
+  "bytes": 55689,
   "pages": 5,
   "compiler": "Tectonic 0.17.0",
   "visual_inspection_passed": true,
-  "visual_inspection": "all five compiled pages rendered and inspected after text cleanup",
+  "visual_inspection": "all five final pages rendered and inspected",
   "text_and_metric_checks": "passed",
   "acknowledgement_sentences": 1
 }

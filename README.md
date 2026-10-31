@@ -83,4 +83,4 @@ It can also be compiled with pdfLaTeX on Overleaf. The report PDF is already inc
 
 ## Method references
 
-The neural models use ideas from [TabM](https://arxiv.org/abs/2410.24210) and [Set Transformer](https://proceedings.mlr.press/v97/lee19d.html), cited in the report.
+Candidate-context comparison relates to [groupwise ranking](https://arxiv.org/abs/1811.04415), L2 coefficient shrinkage to [ridge regularization](https://doi.org/10.1080/00401706.1970.10488634), and final-answer consensus to [self-consistency](https://arxiv.org/abs/2203.11171). The neural models use ideas from [TabM](https://arxiv.org/abs/2410.24210) and [Set Transformer](https://proceedings.mlr.press/v97/lee19d.html). The report specifies the feature definitions, separate penalties and max-plus-log-count aggregation rule.
