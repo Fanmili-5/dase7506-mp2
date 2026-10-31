@@ -1,6 +1,6 @@
 # DASE7506 MP2: Choosing among four mathematical solutions
 
-This repository contains the model that answered **399/467 test questions correctly (85.4390%)**, its training code, complete checkpoint and [report](report/MP2_Report.pdf). The editable [LaTeX source](report/MP2_Report.tex) is included.
+This repository contains a model for selecting among four mathematical solutions. It answered **399/467 test questions correctly (85.4390%)**. Training code, the complete checkpoint, the [report](report/MP2_Report.pdf) and its editable [LaTeX source](report/MP2_Report.tex) are included.
 
 The method combines a linear verifier with two small neural verifiers. It uses the supplied candidate representations and arithmetic/number-source features. Inference runs on CPU with NumPy; it does not need an LLM or a network connection.
 
@@ -16,15 +16,14 @@ python3.12 -m venv .venv
 python -m pip install -r requirements-inference.txt
 python scripts/check_release.py --ready-to-submit
 
-git clone https://github.com/xudongwu-0/DASE7506-MP2.git ../mp2-official
-git -C ../mp2-official checkout bb801f4f2e7629d270df765ab12c333b2dc616bb
+COURSE_DATA="/absolute/path/to/provided/code/data"
 
 python scripts/evaluate_direct_selected_20261031.py \
   --snapshot inference --split test --final-test \
-  --data-dir ../mp2-official/code/data --output runs/test_reproduction
+  --data-dir "$COURSE_DATA" --output runs/test_reproduction
 ```
 
-The evaluation command runs the unchanged official predictor and scorer in separate fresh CPU processes. It disables CUDA, sets numerical libraries to one thread, restricts CPU affinity, and monitors the complete time and thread count. The predictor cannot open the reference-answer file. Use a new output directory for another run.
+Set `COURSE_DATA` to the `code/data` directory in the supplied course package. The evaluation command runs the unchanged official predictor and scorer in separate fresh CPU processes. It disables CUDA, sets numerical libraries to one thread, restricts CPU affinity, and monitors the complete time and thread count. The predictor cannot open the reference-answer file. Use a new output directory for another run.
 
 The expected result is `correct=399`, `n=467` and `accuracy=85.4389721627409`. The preserved official result is [evaluation/test-score.json](evaluation/test-score.json).
 
@@ -38,7 +37,7 @@ With the virtual environment above active, install Torch and expose one GPU no s
 python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu126
 python -m pip install -r requirements-training.txt
 CUDA_VISIBLE_DEVICES=0 python scripts/reproduce_extended_training.py \
-  --data-dir ../mp2-official/code/data --output runs/training_reproduction
+  --data-dir "$COURSE_DATA" --output runs/training_reproduction
 ```
 
 This runs six linear fits and twelve neural fits serially, then assembles the submitted configuration. It fits only supplied training data and uses validation for early stopping and selection. The replay workspace contains train/validation inputs only; it does not score test or replace the released checkpoint.
@@ -70,7 +69,7 @@ The course limits are 30 seconds on the reference Xeon 8457C, 16 MiB of assets a
 
 Every training run used a single RTX 4090. Development ran two independent experiments at a time, one on each card, with no multi-GPU training within either experiment. The successful replay runs all fits serially on one card.
 
-The recent family used 18 fits. Earlier search records are retained separately, with overlap noted rather than treated as an exact total. The [evidence/](evidence/) and [evaluation/](evaluation/) directories contain selection records, costs and official results. [CHECKPOINT_MANIFEST.json](CHECKPOINT_MANIFEST.json) lists the assets; [RELEASE_MANIFEST.json](RELEASE_MANIFEST.json) records the code and document hashes. The predictor does not read these records.
+The recent model family used 18 fits. Earlier search costs are recorded separately because some historical entries overlap. The [evidence/](evidence/) and [evaluation/](evaluation/) directories contain selection records, costs and official results. [CHECKPOINT_MANIFEST.json](CHECKPOINT_MANIFEST.json) lists the assets; [RELEASE_MANIFEST.json](RELEASE_MANIFEST.json) records the code and document hashes.
 
 ## Build the LaTeX report
 
@@ -82,8 +81,6 @@ tectonic --outdir report report/MP2_Report.tex
 
 It can also be compiled with pdfLaTeX on Overleaf. The report PDF is already included, so LaTeX is not needed for model evaluation.
 
-## Sources
+## Method references
 
-The relative-verifier design follows Anchmy's public implementation, independently reimplemented here. The network uses ideas from TabM and set attention. References are listed in [ATTRIBUTION.md](ATTRIBUTION.md) and the report. Keep [LICENSE.txt](LICENSE.txt) and [NOTICE.txt](NOTICE.txt) with the release.
-
-The inference freeze remains `4ab3279f6f968f80733fa3cf35c0ee17674f93b40c86c0fd5894234677bfe3a9`. This documentation revision changes the explanation and report, not the model, checkpoint or official score. Supplied raw data and prediction caches are not redistributed.
+The neural models use ideas from [TabM](https://arxiv.org/abs/2410.24210) and [Set Transformer](https://proceedings.mlr.press/v97/lee19d.html), cited in the report.

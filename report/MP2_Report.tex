@@ -25,7 +25,7 @@ This project studies how to select a correct answer from four supplied mathemati
 
 \section{Task and experimental setup}
 
-Each question has four candidate solutions and a fixed 1,024-dimensional representation for each candidate. The program returns one candidate index. The official scorer checks its final numeric answer, including equivalent fractions and decimals; any correct candidate earns the point. The task and resource limits follow the course guide~\cite{guide}.
+Each question has four candidate solutions and a fixed 1,024-dimensional representation for each candidate. The program returns one candidate index. The official scorer checks its final numeric answer, including equivalent fractions and decimals; any correct candidate earns the point.
 
 The question investigated here is whether learned interactions among candidates can complement a relative linear verifier. The linear model already compares candidates through relative features. The hypothesis is that learned interaction and different outcome objectives can provide complementary rankings.
 
@@ -50,7 +50,7 @@ Validation is used for epoch, seed, regularization and combination choices. Earl
 
 \subsection{Relative linear verifier}
 
-The baseline independently implements the relative-verifier design in~\cite{relative}. Let $e_i$ be candidate $i$'s representation. Its relative representation is
+The linear baseline compares candidates through relative features. Let $e_i$ be candidate $i$'s representation. Its relative representation is
 \[
  c_i=e_i-\frac14\sum_{j=1}^4e_j,
  \qquad
@@ -188,18 +188,12 @@ The labels concern final answers. Arithmetic features measure local numerical co
 
 Validation contains 355 disagreement questions and supports several model-selection decisions. The comparisons describe the selected configurations on the provided splits; an independent bank would provide an additional measure of generalization.
 
-The relative features and answer aggregation follow~\cite{relative}, with an independent implementation. The neural models adapt ideas from~\cite{tabm,settransformer}; all parameters are trained from scratch on course data, with no additional pretrained weights or external datasets.
+The neural models adapt ideas from~\cite{tabm,settransformer}; all parameters are trained from scratch on course data, with no additional pretrained weights or external datasets.
 
 \paragraph{Acknowledgement.}
 OpenAI Codex assisted with implementation, experiment execution, analysis and report preparation.
 
-\begin{thebibliography}{9}
-\bibitem{guide} X. Wu. DASE7506 MP2: Selecting Reliable LLM Reasoning. Fall 2026.
-\url{https://github.com/xudongwu-0/DASE7506-MP2/blob/main/guide/GUIDE.md}.
-
-\bibitem{relative} Anchmy. \texttt{dase7506-mp2-group-relative-verifier}.
-\href{https://github.com/Anchmy/dase7506-mp2-group-relative-verifier/tree/08813bf6ad85fea5242fc40392f25dd8ba26e1cf}{Code, revision \texttt{08813bf6}}.
-
+\begin{thebibliography}{2}
 \bibitem{tabm} Y. Gorishniy, A. Kotelnikov and A. Babenko. TabM: Advancing Tabular Deep Learning with Parameter-Efficient Ensembling. ICLR, 2025. \url{https://arxiv.org/abs/2410.24210}.
 
 \bibitem{settransformer} J. Lee et al. Set Transformer: A Framework for Attention-based Permutation-Invariant Neural Networks. ICML, PMLR 97:3744--3753, 2019. \url{https://proceedings.mlr.press/v97/lee19d.html}.
