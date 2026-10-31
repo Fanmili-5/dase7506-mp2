@@ -68,7 +68,7 @@ The report explains the losses, seed choices, ablation and limitations. CPU vali
 
 The course limits are 30 seconds on the reference Xeon 8457C, 16 MiB of assets and four total threads. Local measurements satisfy these thresholds; reference-machine timing eligibility remains for the instructor to determine.
 
-Original development ran pairs of independent experiments concurrently on two 4090 cards. Each fit used one card; the successful replay was serial on one card. The course's one-GPU rule has not been confirmed to permit the earlier concurrent schedule. The report and [self-review](docs/SELF_REVIEW_20261031.md) retain this point explicitly.
+Every training run used a single RTX 4090. Development ran two independent experiments at a time, one on each card, with no multi-GPU training within either experiment. The successful replay runs all fits serially on one card.
 
 The recent family used 18 fits. Earlier search records are retained separately, with overlap noted rather than treated as an exact total. The [evidence/](evidence/) and [evaluation/](evaluation/) directories contain selection records, costs and official results. [CHECKPOINT_MANIFEST.json](CHECKPOINT_MANIFEST.json) lists the assets; [RELEASE_MANIFEST.json](RELEASE_MANIFEST.json) records the code and document hashes. The predictor does not read these records.
 

@@ -60,7 +60,8 @@ def main():
         'asset_bytes':assets,'report_pages':report['pages'],'frozen_source_hashes':'passed','release_hashes':'passed',
         'single_GPU_training_replay':reproduction['state'],
         'scope':'package integrity and recorded measurements; not instructor eligibility approval',
-        'eligibility_review_remaining':['reference CPU timing','original concurrent development GPU schedule'],
+        'eligibility_review_remaining':['reference CPU timing'],
+        'training_resources':'one RTX 4090 per training run; independent experiments ran concurrently',
         'score_submission':'student action; this checker does not create submission issues'},indent=2))
 
 

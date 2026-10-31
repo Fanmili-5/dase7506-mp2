@@ -1,9 +1,9 @@
 {
   "pages": 5,
-  "sha256": "44eb54790fb2604dd93b2496ab06ab6066c54bf274507a4c0d2b6526608ae8c4",
-  "bytes": 16437,
+  "sha256": "a7954f9893b6cec2f28ff8465d1665812d4ad6b1c2a63dccf78b307b5123e6fc",
+  "bytes": 16302,
   "built_from": "report/MP2_Report.md via scripts/build_submission_report.py",
-  "visual_inspection": "all five latest rendered pages inspected; no clipping, overlap or broken glyphs",
+  "visual_inspection": "corrected page 4 rendered and inspected; other four pages text-identical to previously inspected report",
   "visual_inspection_passed": true,
   "text_and_metric_checks": "passed",
   "reportlab": "4.4.9",

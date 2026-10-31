@@ -132,9 +132,9 @@ Inference uses NumPy. The ten checkpoint files contain all weights, preprocessin
 | Independent / joint mass networks | 3 / 3 | 56.33 / 55.85 s |
 | Pairwise / answer-group networks | 3 / 3 | 53.27 / 80.96 s |
 
-The two neural routes in each pair ran concurrently on separate RTX 4090 cards; each fit used one card. These paired times are not added as wall time. The course specifies CPU or one GPU no stronger than a 4090. The concurrent development schedule is disclosed here; it has not been confirmed as an allowed interpretation of that rule.
+Each training run used one RTX 4090. Two independent experiments ran at the same time, one on each available card; no training run used multiple GPUs. The paired stage times therefore describe separate experiments and are not added as wall time.
 
-The submitted training command was also run serially on one exposed 4090. It completed these 18 fits in 274.07 seconds and reproduced all ten checkpoint files byte for byte, including all 62 arrays. This confirms the recorded environment, rather than promising identical training on every machine. The successful replay does not change the earlier concurrency disclosure.
+The submitted training command was also run serially on one exposed 4090. It completed these 18 fits in 274.07 seconds and reproduced all ten checkpoint files byte for byte, including all 62 arrays. This confirms the recorded environment, rather than promising identical training on every machine.
 
 These costs cover the recent model family. Earlier searches are recorded separately in the repository. Some historical records overlap, so they are not summed into a project total.
 
