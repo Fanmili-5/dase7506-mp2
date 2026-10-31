@@ -10,18 +10,19 @@
       "before_sha256": "805d0b8cafcf8a3c4fcab21fc45b4454e15cee953565c25d85672ac26ba8726a",
       "after_sha256": "ff0d85e322989a5407aa55e6e390a39e7f3ea22ec69447073c2bbfe3ed8a7d65",
       "registration_metadata": false,
-      "semantic_ast_sha256": "bbf66c8fc164bdb034a162d63998c82f047fd9fda803074d31e9183be8003cc3"
+      "semantic_ast_sha256": "9f438671f7181943c2d32b26e25af58b1d642ff9bd88589b83959ebf75d6dfff"
     },
     {
       "path": "training/train_relative_direct_20261031.py",
       "before_sha256": "00e0d15431d79e0b00323dbb46b9aab86cfabd57d65676b51142fbe46d56c06f",
       "after_sha256": "bf3c1a086c69c248ce55877e7e9fbcfec0679c34f6003a88b116af588ada3661",
       "registration_metadata": true,
-      "semantic_ast_sha256": "00c528357f5e5d8aeefebe0ea2194d6ebb9982eb4329c244a275e4aba8a81039"
+      "semantic_ast_sha256": "5b5c95a8b1480ace061a56e1f208e192c017763bf01d3e062e8ac831ada31c9b"
     }
   ],
   "checkpoint_bytes_unchanged": true,
   "official_scores_unchanged": true,
   "new_model_training": false,
-  "new_test_scoring": false
+  "new_test_scoring": false,
+  "semantic_ast_encoding": "json_ast_v1_ignore_empty_type_params"
 }

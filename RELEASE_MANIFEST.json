@@ -76,8 +76,8 @@
       "sha256": "c5ad937239a9536fc4b47edbfcb37521d619aa4ab5e90ef84b5fd85df92cb9b4"
     },
     "evidence/source_revision.json": {
-      "bytes": 13670,
-      "sha256": "174add76996209a8f0a5cbe2983980d6d62e228ec6d87517d7a2081118f93d2d"
+      "bytes": 13737,
+      "sha256": "7033013442a8d4718006876b3e81c132aeca93e792636bbe2914a34affcbe739"
     },
     "evidence/training_reproduction.json": {
       "bytes": 17972,
@@ -412,8 +412,8 @@
       "sha256": "bae6d622afc31105b419ffb3ae68002efbec272ddba32a5dd555cca10fc620e1"
     },
     "scripts/check_release.py": {
-      "bytes": 6954,
-      "sha256": "ef4349b06de70d83b056c5773a610df135a5076e3b2fc0580849892b55d2a066"
+      "bytes": 7456,
+      "sha256": "1d9b71b68947369979b1512ebde9c45a38d2b8ca80839e4754cd3ca33c3dd566"
     },
     "scripts/evaluate_direct_selected_20261031.py": {
       "bytes": 5804,

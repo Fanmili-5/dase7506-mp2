@@ -24,7 +24,19 @@ def semantic_digest(path, registration_metadata=False):
                 assert isinstance(value,ast.Dict)
                 pairs=[(k,v) for k,v in zip(value.keys,value.values) if not (isinstance(k,ast.Constant) and k.value=='source')]
                 value.keys=[k for k,v in pairs];value.values=[v for k,v in pairs]
-    return hashlib.sha256(ast.dump(tree,include_attributes=False).encode()).hexdigest()
+    def encode(value):
+        if isinstance(value,ast.AST):
+            fields={}
+            for name,item in ast.iter_fields(value):
+                if name=='type_params':
+                    assert not item
+                    continue
+                fields[name]=encode(item)
+            return {'node':type(value).__name__,'fields':fields}
+        if isinstance(value,list):return [encode(item) for item in value]
+        return value
+    payload=json.dumps(encode(tree),sort_keys=True,separators=(',',':'),ensure_ascii=True)
+    return hashlib.sha256(payload.encode()).hexdigest()
 
 
 def verify_source_revision(fixed,freeze,scored_hash):
